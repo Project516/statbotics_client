@@ -90,12 +90,16 @@ class StatboticsMatch {
     switch (compLevel) {
       case 'qm':
         return 'Q$matchNumber';
+      case 'ef':
+        return 'EF$matchNumber';
+      case 'qf':
+        return 'QF$matchNumber';
       case 'sf':
         return 'SF$matchNumber';
       case 'f':
         return 'F$matchNumber';
       default:
-        return '$compLevel$matchNumber';
+        return '${compLevel.toUpperCase()}$matchNumber';
     }
   }
 
