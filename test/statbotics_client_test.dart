@@ -237,8 +237,10 @@ void main() {
       expect(matchOf('qm', 1).isQualification, isTrue);
     });
 
-    test('getEvents parses list, filters by year, and sorts by week then name',
-        () async {
+    // The year is a server-side query parameter, not a client-side filter, so
+    // the assertions here are the request URL and the ordering of what comes
+    // back.
+    test('getEvents requests the year and sorts by week then name', () async {
       final mockClient = MockClient((request) async {
         expect(
           request.url.toString(),
@@ -314,6 +316,7 @@ void main() {
             _matchJson('2026mrcmp_f1', 'f', 1, [13, 14, 15], [16, 17, 18]),
             _matchJson('2026mrcmp_qf1', 'qf', 1, [19, 20, 21], [22, 23, 24]),
             _matchJson('2026mrcmp_sf1', 'sf', 1, [25, 26, 27], [28, 29, 30]),
+            _matchJson('2026mrcmp_ef1', 'ef', 1, [31, 32, 33], [34, 35, 36]),
           ]),
           200,
           headers: <String, String>{'content-type': 'application/json'},
@@ -323,13 +326,14 @@ void main() {
       final client = StatboticsClient(httpClient: mockClient);
       final matches = await client.getEventMatches('2026mrcmp');
 
-      expect(matches.length, 5);
+      expect(matches.length, 6);
       // qm < ef < qf < sf < f, then by match number within a level.
       expect(matches[0].key, '2026mrcmp_qm75');
-      expect(matches[1].key, '2026mrcmp_qf1');
-      expect(matches[2].key, '2026mrcmp_qf2');
-      expect(matches[3].key, '2026mrcmp_sf1');
-      expect(matches[4].key, '2026mrcmp_f1');
+      expect(matches[1].key, '2026mrcmp_ef1');
+      expect(matches[2].key, '2026mrcmp_qf1');
+      expect(matches[3].key, '2026mrcmp_qf2');
+      expect(matches[4].key, '2026mrcmp_sf1');
+      expect(matches[5].key, '2026mrcmp_f1');
       expect(matches.first.redTeams, [7, 8, 9]);
       expect(matches.last.isQualification, isFalse);
     });
