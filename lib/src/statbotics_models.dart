@@ -232,6 +232,7 @@ class StatboticsTeamEvent {
     required this.team,
     required this.event,
     required this.eventName,
+    this.teamName = '',
     required this.year,
     required this.wins,
     required this.losses,
@@ -247,6 +248,7 @@ class StatboticsTeamEvent {
       team: (json['team'] as num?)?.toInt() ?? 0,
       event: (json['event'] as String?) ?? '',
       eventName: (json['event_name'] as String?) ?? '',
+      teamName: (json['team_name'] as String?) ?? '',
       year: (json['year'] as num?)?.toInt() ?? 0,
       wins: (json['wins'] as num?)?.toInt() ?? 0,
       losses: (json['losses'] as num?)?.toInt() ?? 0,
@@ -261,6 +263,14 @@ class StatboticsTeamEvent {
   final int team;
   final String event;
   final String eventName;
+
+  /// The team's nickname, as `/team_events` reports it.
+  ///
+  /// Worth reading here because `/teams` takes an `event` parameter and ignores
+  /// it, returning the global team list whatever event you ask for, so this is
+  /// the only endpoint that gives event-scoped names. Empty when the payload
+  /// omits it.
+  final String teamName;
   final int year;
   final int wins;
   final int losses;

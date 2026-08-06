@@ -121,9 +121,15 @@ class StatboticsClient {
     return results;
   }
 
-  /// `GET /v3/teams?event={eventKey}&limit=100` — returns basic team info
-  /// (number + nickname) for all teams at the event. Returns an empty list if
-  /// the endpoint is unavailable.
+  /// `GET /v3/teams?event={eventKey}&limit=100` — basic team info, number and
+  /// nickname.
+  ///
+  /// **Not event-scoped.** Statbotics accepts the `event` parameter and ignores
+  /// it, so this answers with the first 100 teams of the global list whatever
+  /// event you ask for. Use `getEventTeams` and read
+  /// `StatboticsTeamEvent.teamName` for an event's actual roster. Kept for
+  /// looking up teams generally. Returns an empty list if the endpoint is
+  /// unavailable.
   Future<List<StatboticsTeamBasic>> getEventTeamsBasic(String eventKey) async {
     try {
       final body = await _get(

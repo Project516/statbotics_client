@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0
+
+- `StatboticsTeamEvent.teamName` exposes the nickname `/team_events` already
+  returns. It is the only endpoint that gives event-scoped names: `/teams`
+  accepts an `event` parameter and ignores it, answering with the global team
+  list whatever event you ask for, which is documented on the new field and in
+  `getEventTeamsBasic`. Defaults to an empty string, so nothing that builds a
+  `StatboticsTeamEvent` by hand has to change.
+
 ## 0.2.0
 
 - `StatboticsMatch.displayName` renders every playoff level in the same case as

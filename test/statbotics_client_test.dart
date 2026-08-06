@@ -148,6 +148,36 @@ void main() {
       expect(teams, isEmpty);
     });
 
+    test('StatboticsTeamEvent reads the nickname team_events carries', () {
+      // The only event-scoped source of names: /teams ignores its `event`
+      // parameter and answers with the global list.
+      final te = StatboticsTeamEvent.fromJson(<String, dynamic>{
+        'team': 3847,
+        'event': '2026txhou',
+        'event_name': 'Houston',
+        'team_name': 'Spectrum',
+        'year': 2026,
+        'wins': 1,
+        'losses': 0,
+        'ties': 0,
+        'epa': <String, dynamic>{},
+      });
+      expect(te.teamName, 'Spectrum');
+    });
+
+    test('StatboticsTeamEvent without a team_name reads as empty', () {
+      final te = StatboticsTeamEvent.fromJson(<String, dynamic>{
+        'team': 3847,
+        'event': '2026txhou',
+        'year': 2026,
+        'wins': 0,
+        'losses': 0,
+        'ties': 0,
+        'epa': <String, dynamic>{},
+      });
+      expect(te.teamName, isEmpty);
+    });
+
     test('StatboticsTeamEvent.record omits ties when zero', () {
       final te = StatboticsTeamEvent.fromJson(<String, dynamic>{
         'team': 1234,
