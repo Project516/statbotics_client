@@ -13,23 +13,6 @@ client.close();
 
 No API key needed. Transient server errors are retried with a pluggable `sleep` (inject a no-op in tests); non-transient failures throw `StatboticsApiException` with the status code.
 
-## Installation
-
-Add the dependency in `pubspec.yaml`:
-
-```yaml
-dependencies:
-  statbotics_client: ^0.1.0
-```
-
-Or pull the latest from Git:
-
-```yaml
-dependencies:
-  statbotics_client:
-    git: https://github.com/Project516/statbotics_client.git
-```
-
 ## API reference
 
 `StatboticsClient` targets `https://api.statbotics.io/v3`. It needs no auth key.
