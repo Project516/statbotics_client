@@ -5,6 +5,35 @@ import 'package:http/http.dart' as http;
 import 'package:statbotics_client/statbotics_client.dart';
 import 'package:http/testing.dart';
 
+/// Builds the JSON object Statbotics returns for a single match, with the
+/// [team_keys] form the v3 API actually uses for alliances.
+Map<String, dynamic> _matchJson(
+  String key,
+  String compLevel,
+  int matchNumber,
+  List<int> redTeams,
+  List<int> blueTeams,
+) {
+  return <String, dynamic>{
+    'key': key,
+    'event': '2026mrcmp',
+    'match_number': matchNumber,
+    'comp_level': compLevel,
+    'alliances': <String, dynamic>{
+      'red': <String, dynamic>{
+        'team_keys': redTeams,
+        'surrogate_team_keys': const <int>[],
+        'dq_team_keys': const <int>[],
+      },
+      'blue': <String, dynamic>{
+        'team_keys': blueTeams,
+        'surrogate_team_keys': const <int>[],
+        'dq_team_keys': const <int>[],
+      },
+    },
+  };
+}
+
 void main() {
   group('StatboticsClient', () {
     test('getEvent parses event fields', () async {
@@ -183,6 +212,202 @@ void main() {
       expect(match.redTeams, [4998, 5260, 3534]);
       expect(match.blueTeams, [2137, 9776, 9207]);
       expect(match.displayName, 'Q1');
+    });
+
+    test('StatboticsMatch.displayName formats every comp level consistently',
+        () {
+      // Every known FRC comp level uses its conventional two-letter
+      // abbreviation; qualification matches collapse to "Q<number>".
+      // Unknown levels fall through to "<LEVEL><n>" in upper case so a
+      // future level never silently renders lower case.
+      matchOf(String level, int n) =>
+          StatboticsMatch.fromJson(<String, dynamic>{
+            'key': '2026x_$level$n',
+            'event': '2026x',
+            'match_number': n,
+            'comp_level': level,
+            'alliances': const <String, dynamic>{},
+          });
+      expect(matchOf('qm', 12).displayName, 'Q12');
+      expect(matchOf('ef', 2).displayName, 'EF2');
+      expect(matchOf('qf', 3).displayName, 'QF3');
+      expect(matchOf('sf', 1).displayName, 'SF1');
+      expect(matchOf('f', 2).displayName, 'F2');
+      expect(matchOf('xx', 5).displayName, 'XX5');
+      expect(matchOf('qm', 1).isQualification, isTrue);
+    });
+
+    // The year is a server-side query parameter, not a client-side filter, so
+    // the assertions here are the request URL and the ordering of what comes
+    // back.
+    test('getEvents requests the year and sorts by week then name', () async {
+      final mockClient = MockClient((request) async {
+        expect(
+          request.url.toString(),
+          'https://api.statbotics.io/v3/events?year=2026&limit=500',
+        );
+        return http.Response(
+          jsonEncode(<Map<String, dynamic>>[
+            // Deliberately out of order: a later-week event first, then a
+            // null-week event, then an earlier-week event sharing a week with
+            // another entry to exercise the secondary name sort.
+            <String, dynamic>{
+              'key': '2026txhou',
+              'name': 'Houston District',
+              'year': 2026,
+              'week': 4,
+            },
+            <String, dynamic>{
+              'key': '2026off',
+              'name': 'Off-Season Demo',
+              'year': 2026,
+              // week omitted -> null, must sort after every numbered week.
+            },
+            <String, dynamic>{
+              'key': '2026nyfl',
+              'name': 'Finger Lakes Regional',
+              'year': 2026,
+              'week': 2,
+            },
+            <String, dynamic>{
+              'key': '2026azpx',
+              'name': 'A high-desert Event',
+              'year': 2026,
+              'week': 2,
+            },
+          ]),
+          200,
+          headers: <String, String>{'content-type': 'application/json'},
+        );
+      });
+
+      final client = StatboticsClient(httpClient: mockClient);
+      final events = await client.getEvents(2026);
+
+      expect(events.length, 4);
+      // Sorted by week ascending, then name; null week sorts last.
+      expect(events[0].key, '2026azpx'); // week 2, "A high-desert Event"
+      expect(events[1].key, '2026nyfl'); // week 2, "Finger Lakes Regional"
+      expect(events[2].key, '2026txhou'); // week 4
+      expect(events[3].key, '2026off'); // null week -> end
+      expect(events[3].week, isNull);
+    });
+
+    test('getEvents returns empty list on 404', () async {
+      final client = StatboticsClient(
+        httpClient: MockClient((_) async => http.Response('', 404)),
+      );
+      final events = await client.getEvents(2026);
+      expect(events, isEmpty);
+    });
+
+    test('getEventMatches parses list and sorts by comp level then number',
+        () async {
+      final mockClient = MockClient((request) async {
+        expect(
+          request.url.toString(),
+          'https://api.statbotics.io/v3/matches?event=2026mrcmp&limit=200',
+        );
+        expect(request.url.queryParameters['event'], '2026mrcmp');
+        return http.Response(
+          jsonEncode(<Map<String, dynamic>>[
+            _matchJson('2026mrcmp_qf2', 'qf', 2, [1, 2, 3], [4, 5, 6]),
+            _matchJson('2026mrcmp_qm75', 'qm', 75, [7, 8, 9], [10, 11, 12]),
+            _matchJson('2026mrcmp_f1', 'f', 1, [13, 14, 15], [16, 17, 18]),
+            _matchJson('2026mrcmp_qf1', 'qf', 1, [19, 20, 21], [22, 23, 24]),
+            _matchJson('2026mrcmp_sf1', 'sf', 1, [25, 26, 27], [28, 29, 30]),
+            _matchJson('2026mrcmp_ef1', 'ef', 1, [31, 32, 33], [34, 35, 36]),
+          ]),
+          200,
+          headers: <String, String>{'content-type': 'application/json'},
+        );
+      });
+
+      final client = StatboticsClient(httpClient: mockClient);
+      final matches = await client.getEventMatches('2026mrcmp');
+
+      expect(matches.length, 6);
+      // qm < ef < qf < sf < f, then by match number within a level.
+      expect(matches[0].key, '2026mrcmp_qm75');
+      expect(matches[1].key, '2026mrcmp_ef1');
+      expect(matches[2].key, '2026mrcmp_qf1');
+      expect(matches[3].key, '2026mrcmp_qf2');
+      expect(matches[4].key, '2026mrcmp_sf1');
+      expect(matches[5].key, '2026mrcmp_f1');
+      expect(matches.first.redTeams, [7, 8, 9]);
+      expect(matches.last.isQualification, isFalse);
+    });
+
+    test('getEventMatches returns empty list on 404', () async {
+      final client = StatboticsClient(
+        httpClient: MockClient((_) async => http.Response('', 404)),
+      );
+      final matches = await client.getEventMatches('9999xxx');
+      expect(matches, isEmpty);
+    });
+
+    test('getEventTeamsBasic parses the basic team list', () async {
+      final mockClient = MockClient((request) async {
+        expect(
+          request.url.toString(),
+          'https://api.statbotics.io/v3/teams?event=2026mrcmp&limit=100',
+        );
+        expect(request.url.queryParameters['event'], '2026mrcmp');
+        return http.Response(
+          jsonEncode(<Map<String, dynamic>>[
+            <String, dynamic>{
+              'team': 2714,
+              'name': 'Mech Tech',
+              'country': 'USA',
+            },
+            <String, dynamic>{
+              'team': 1234,
+              'name': 'Example Robotics',
+            },
+          ]),
+          200,
+          headers: <String, String>{'content-type': 'application/json'},
+        );
+      });
+
+      final client = StatboticsClient(httpClient: mockClient);
+      final teams = await client.getEventTeamsBasic('2026mrcmp');
+
+      expect(teams.length, 2);
+      expect(teams[0].team, 2714);
+      expect(teams[0].nickname, 'Mech Tech');
+      expect(teams[1].nickname, 'Example Robotics');
+    });
+
+    test('getEventTeamsBasic returns an empty list when the endpoint fails',
+        () async {
+      // The basic-team endpoint is best-effort: a non-transient error from the
+      // API must not bubble up, it must degrade to an empty list.
+      var calls = 0;
+      final mockClient = MockClient((_) async {
+        calls++;
+        return http.Response('forbidden', 403);
+      });
+      final client = StatboticsClient(
+        httpClient: mockClient,
+        sleep: (_) async {},
+      );
+      final teams = await client.getEventTeamsBasic('2026mrcmp');
+      expect(teams, isEmpty);
+      // 403 is not transient, so the request is attempted exactly once.
+      expect(calls, 1);
+    });
+
+    test('getEventTeamsBasic swallows a malformed response with an empty list',
+        () async {
+      // A truncated/garbled body would throw during jsonDecode; the handler
+      // catches that and reports no teams rather than crashing callers.
+      final mockClient = MockClient(
+        (_) async => http.Response('not json at all', 200),
+      );
+      final client = StatboticsClient(httpClient: mockClient);
+      final teams = await client.getEventTeamsBasic('2026mrcmp');
+      expect(teams, isEmpty);
     });
 
     test('retries a transient 500 then succeeds (#496)', () async {
