@@ -178,6 +178,58 @@ void main() {
       expect(te.teamName, isEmpty);
     });
 
+    test('StatboticsTeamEvent.toJson round-trips team_name', () {
+      // toJson advertised a round-trip for the on-device last-good cache, but
+      // omitted team_name, so a cached StatboticsTeamEvent came back with an
+      // empty nickname. The cache key Statbotics itself does not store is the
+      // one event-scoped name source (/teams ignores its event param), so the
+      // loss was silent.
+      final original = StatboticsTeamEvent.fromJson(<String, dynamic>{
+        'team': 3847,
+        'event': '2026txhou',
+        'event_name': 'Houston',
+        'team_name': 'Spectrum',
+        'year': 2026,
+        'wins': 1,
+        'losses': 0,
+        'ties': 0,
+        'rank': 7,
+        'num_teams': 42,
+        'epa': <String, dynamic>{
+          'total_points': <String, dynamic>{'mean': 41.2, 'sd': 2.9},
+          'auto_points': <String, dynamic>{'mean': 9.5},
+        },
+      });
+      final restored = StatboticsTeamEvent.fromJson(original.toJson());
+      expect(restored.teamName, 'Spectrum');
+      expect(restored.team, 3847);
+      expect(restored.event, '2026txhou');
+      expect(restored.eventName, 'Houston');
+      expect(restored.year, 2026);
+      expect(restored.wins, 1);
+      expect(restored.losses, 0);
+      expect(restored.ties, 0);
+      expect(restored.rank, 7);
+      expect(restored.numTeams, 42);
+      expect(restored.epa.totalPointsMean, closeTo(41.2, 0.01));
+      expect(restored.epa.autoPointsMean, closeTo(9.5, 0.01));
+    });
+
+    test('StatboticsTeamEvent.toJson round-trips an empty team_name', () {
+      final original = StatboticsTeamEvent.fromJson(<String, dynamic>{
+        'team': 111,
+        'event': '2026x',
+        'event_name': 'X',
+        'year': 2026,
+        'wins': 0,
+        'losses': 0,
+        'ties': 0,
+        'epa': <String, dynamic>{},
+      });
+      final restored = StatboticsTeamEvent.fromJson(original.toJson());
+      expect(restored.teamName, isEmpty);
+    });
+
     test('StatboticsTeamEvent.record omits ties when zero', () {
       final te = StatboticsTeamEvent.fromJson(<String, dynamic>{
         'team': 1234,

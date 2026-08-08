@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.1
+
+- `StatboticsTeamEvent.toJson` now serializes `team_name`, so the
+  round-trip `toJson` advertises through `fromJson` actually preserves the
+  nickname. Previously the field was decoded but left out of `toJson`, so a
+  cached record came back from the on-device last-good cache with an empty
+  `teamName` even though `/team_events` had carried one. Only `team_name` was at
+  risk; every other field already round-tripped.
+
 ## 0.3.0
 
 - `StatboticsTeamEvent.teamName` exposes the nickname `/team_events` already
