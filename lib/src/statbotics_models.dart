@@ -286,6 +286,7 @@ class StatboticsTeamEvent {
       'team': team,
       'event': event,
       'event_name': eventName,
+      'team_name': teamName,
       'year': year,
       'wins': wins,
       'losses': losses,
