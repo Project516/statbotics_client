@@ -6,9 +6,12 @@ A typed Dart client for the [Statbotics](https://www.statbotics.io) API v3: EPA 
 import 'package:statbotics_client/statbotics_client.dart';
 
 final client = StatboticsClient();
-final events = await client.getEvents(2026);
-final teams = await client.getEventTeams('2026txhou');
-client.close();
+try {
+  final events = await client.getEvents(2026);
+  final teams = await client.getEventTeams('2026txhou');
+} finally {
+  client.close();
+}
 ```
 
 No API key needed. Transient server errors are retried with a pluggable `sleep` (inject a no-op in tests); non-transient failures throw `StatboticsApiException` with the status code.
