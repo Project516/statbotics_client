@@ -554,7 +554,7 @@ void main() {
       expect(team.nickname, 'Example');
     });
 
-    test('getTeamEvents parses the history and sorts by year then event',
+    test('getTeamEvents parses the history and sorts newest season first',
         () async {
       final mockClient = MockClient((request) async {
         expect(
@@ -620,15 +620,14 @@ void main() {
       final history = await client.getTeamEvents(254);
 
       expect(history.length, 3);
-      // Sorted by year ascending, then event key: 2023 first, then the two
-      // 2024 events in key order (2024cafr before 2024txaus).
-      expect(history[0].year, 2023);
-      expect(history[0].event, '2023cafr');
+      // Newest season first, then event key ascending within a season.
+      expect(history[0].year, 2024);
+      expect(history[0].event, '2024cafr');
       expect(history[0].teamName, 'The Cheesy Poofs');
       expect(history[1].year, 2024);
-      expect(history[1].event, '2024cafr');
-      expect(history[2].year, 2024);
-      expect(history[2].event, '2024txaus');
+      expect(history[1].event, '2024txaus');
+      expect(history[2].year, 2023);
+      expect(history[2].event, '2023cafr');
     });
 
     test('getTeamEvents forwards the optional year filter', () async {

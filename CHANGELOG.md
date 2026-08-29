@@ -3,11 +3,11 @@
 ## 0.3.2
 
 - Added `getTeamEvents(team, {year})` for a team's full Statbotics history
-  across events (issue #9). It reuses the `/team_events` endpoint with a `team`
-  filter instead of `event`, and optionally a `year`, returning every
-  team-event row for that team sorted by year then event key. List endpoints
-  return an empty list on 404, so an unknown team or a team with no recorded
-  events answers with an empty list rather than throwing.
+  across events (part of issue #9). It reuses the `/team_events` endpoint with
+  a `team` filter instead of `event`, and optionally a `year`, returning every
+  team-event row for that team sorted newest season first, then by event key.
+  List endpoints return an empty list on 404, so an unknown team or a team
+  with no recorded events answers with an empty list rather than throwing.
 
 ## 0.3.1
 

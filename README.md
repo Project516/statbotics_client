@@ -33,8 +33,8 @@ call `close()` when you are done so the underlying HTTP client is released.
 | `getEventMatches(eventKey)` | `GET /matches?event={eventKey}` | `List<StatboticsMatch>` |
 
 - `getEventTeams` sorts results by rank ascending.
-- `getTeamEvents` sorts results by year ascending, then event key, so a team's
-  history reads chronologically. Pass `year` to narrow to one season.
+- `getTeamEvents` sorts results newest season first, then by event key, so a
+  team's most recent results lead. Pass `year` to narrow to one season.
 - `getEvents` sorts results by week then name.
 - `getEventMatches` sorts results by comp level (`qm`, `ef`, `qf`, `sf`, `f`)
   then match number.

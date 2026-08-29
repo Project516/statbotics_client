@@ -63,24 +63,26 @@ class StatboticsClient {
     return results;
   }
 
-  /// `GET /team_events?team={team}[&year={year}]&limit=1000` returns every
-  /// team-event record for the given team: the full Statbotics history of that
-  /// team across all events. Pass [year] to narrow the history to one season.
+  /// `GET /v3/team_events?team={team}[&year={year}]&limit=1000` — returns
+  /// every team-event record for the given team: the full Statbotics history
+  /// of that team across all events, newest season first. Pass [year] to
+  /// narrow the history to one season.
   ///
-  /// `/team_events` is the same endpoint `getEventTeams` uses; this overload
+  /// `/team_events` is the same endpoint `getEventTeams` uses; this method
   /// just drops the `event` filter and adds `team` (and optionally `year`),
   /// answering with every row that mentions the team instead of every row for
-  /// one event. Results are sorted by year ascending, then event key, so the
-  /// history reads chronologically. Returns an empty list on 404 (an unknown
-  /// team number) or if the team has no recorded events.
-  Future<List<StatboticsTeamEvent>> getTeamEvents(
-    int team, {
-    int? year,
-    int limit = 1000,
-  }) async {
+  /// one event. Results are sorted by year descending, then event key
+  /// ascending. Returns an empty list on 404 (an unknown team number) or if
+  /// the team has no recorded events.
+  ///
+  /// The 1000-row cap is fixed rather than a parameter, the way the other
+  /// list methods fix theirs: a team plays a handful of events a season, so
+  /// no real team comes close to it and every call answers with the whole
+  /// history.
+  Future<List<StatboticsTeamEvent>> getTeamEvents(int team, {int? year}) async {
     final queryParameters = <String, String>{
       'team': team.toString(),
-      'limit': limit.toString(),
+      'limit': '1000',
     };
     if (year != null) queryParameters['year'] = year.toString();
     final body = await _get(
@@ -97,7 +99,7 @@ class StatboticsClient {
         )
         .toList(growable: true);
     results.sort((a, b) {
-      if (a.year != b.year) return a.year.compareTo(b.year);
+      if (a.year != b.year) return b.year.compareTo(a.year);
       return a.event.compareTo(b.event);
     });
     return results;
