@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.2
+## Unreleased
 
 - Added `getTeamEvents(team, {year})` for a team's full Statbotics history
   across events (part of issue #9). It reuses the `/team_events` endpoint with
