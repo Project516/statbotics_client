@@ -1,6 +1,6 @@
 name: statbotics_client
 description: A typed Dart client for the Statbotics API v3 (FRC EPA statistics, events, matches). Pure Dart, no Flutter dependency.
-version: 0.3.1
+version: 0.3.2
 repository: https://github.com/Project516/statbotics_client
 
 topics:
