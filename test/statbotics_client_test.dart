@@ -553,5 +553,109 @@ void main() {
       expect(team.team, 1234);
       expect(team.nickname, 'Example');
     });
+
+    test('getTeamEvents parses the history and sorts by year then event',
+        () async {
+      final mockClient = MockClient((request) async {
+        expect(
+          request.url.toString(),
+          'https://api.statbotics.io/v3/team_events?team=254&limit=1000',
+        );
+        expect(request.url.queryParameters['team'], '254');
+        expect(request.url.queryParameters['limit'], '1000');
+        return http.Response(
+          jsonEncode(<Map<String, dynamic>>[
+            <String, dynamic>{
+              'team': 254,
+              'event': '2024cafr',
+              'event_name': 'Cal Games',
+              'team_name': 'The Cheesy Poofs',
+              'year': 2024,
+              'wins': 9,
+              'losses': 1,
+              'ties': 0,
+              'rank': 1,
+              'num_teams': 40,
+              'epa': <String, dynamic>{
+                'total_points': <String, dynamic>{'mean': 55.0, 'sd': 2.0},
+              },
+            },
+            <String, dynamic>{
+              'team': 254,
+              'event': '2023cafr',
+              'event_name': 'Cal Games',
+              'team_name': 'The Cheesy Poofs',
+              'year': 2023,
+              'wins': 8,
+              'losses': 2,
+              'ties': 0,
+              'rank': 2,
+              'num_teams': 40,
+              'epa': <String, dynamic>{
+                'total_points': <String, dynamic>{'mean': 50.0, 'sd': 2.5},
+              },
+            },
+            <String, dynamic>{
+              'team': 254,
+              'event': '2024txaus',
+              'event_name': 'Austin',
+              'team_name': 'The Cheesy Poofs',
+              'year': 2024,
+              'wins': 7,
+              'losses': 3,
+              'ties': 0,
+              'rank': 3,
+              'num_teams': 38,
+              'epa': <String, dynamic>{
+                'total_points': <String, dynamic>{'mean': 52.0, 'sd': 2.2},
+              },
+            },
+          ]),
+          200,
+          headers: <String, String>{'content-type': 'application/json'},
+        );
+      });
+
+      final client = StatboticsClient(httpClient: mockClient);
+      final history = await client.getTeamEvents(254);
+
+      expect(history.length, 3);
+      // Sorted by year ascending, then event key: 2023 first, then the two
+      // 2024 events in key order (2024cafr before 2024txaus).
+      expect(history[0].year, 2023);
+      expect(history[0].event, '2023cafr');
+      expect(history[0].teamName, 'The Cheesy Poofs');
+      expect(history[1].year, 2024);
+      expect(history[1].event, '2024cafr');
+      expect(history[2].year, 2024);
+      expect(history[2].event, '2024txaus');
+    });
+
+    test('getTeamEvents forwards the optional year filter', () async {
+      final mockClient = MockClient((request) async {
+        expect(
+          request.url.toString(),
+          'https://api.statbotics.io/v3/team_events?team=254&limit=1000&year=2024',
+        );
+        expect(request.url.queryParameters['year'], '2024');
+        return http.Response(
+          jsonEncode(<List<Map<String, dynamic>>>[]),
+          200,
+          headers: <String, String>{'content-type': 'application/json'},
+        );
+      });
+
+      final client = StatboticsClient(httpClient: mockClient);
+      final history = await client.getTeamEvents(254, year: 2024);
+      expect(history, isEmpty);
+    });
+
+    test('getTeamEvents returns an empty list on 404 (unknown team)', () async {
+      final client = StatboticsClient(
+        httpClient: MockClient((_) async => http.Response('', 404)),
+      );
+      final history = await client.getTeamEvents(999999);
+      expect(history, isEmpty);
+    });
   });
 }

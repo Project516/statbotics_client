@@ -28,10 +28,13 @@ call `close()` when you are done so the underlying HTTP client is released.
 | `getEvent(eventKey)` | `GET /event/{eventKey}` | `StatboticsEvent?` |
 | `getEvents(year)` | `GET /events?year={year}` | `List<StatboticsEvent>` |
 | `getEventTeams(eventKey)` | `GET /team_events?event={eventKey}` | `List<StatboticsTeamEvent>` |
+| `getTeamEvents(team, {year})` | `GET /team_events?team={team}[&year={year}]` | `List<StatboticsTeamEvent>` |
 | `getEventTeamsBasic(eventKey)` | `GET /teams?event={eventKey}` | `List<StatboticsTeamBasic>` |
 | `getEventMatches(eventKey)` | `GET /matches?event={eventKey}` | `List<StatboticsMatch>` |
 
 - `getEventTeams` sorts results by rank ascending.
+- `getTeamEvents` sorts results by year ascending, then event key, so a team's
+  history reads chronologically. Pass `year` to narrow to one season.
 - `getEvents` sorts results by week then name.
 - `getEventMatches` sorts results by comp level (`qm`, `ef`, `qf`, `sf`, `f`)
   then match number.

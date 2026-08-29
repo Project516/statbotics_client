@@ -63,6 +63,46 @@ class StatboticsClient {
     return results;
   }
 
+  /// `GET /team_events?team={team}[&year={year}]&limit=1000` returns every
+  /// team-event record for the given team: the full Statbotics history of that
+  /// team across all events. Pass [year] to narrow the history to one season.
+  ///
+  /// `/team_events` is the same endpoint `getEventTeams` uses; this overload
+  /// just drops the `event` filter and adds `team` (and optionally `year`),
+  /// answering with every row that mentions the team instead of every row for
+  /// one event. Results are sorted by year ascending, then event key, so the
+  /// history reads chronologically. Returns an empty list on 404 (an unknown
+  /// team number) or if the team has no recorded events.
+  Future<List<StatboticsTeamEvent>> getTeamEvents(
+    int team, {
+    int? year,
+    int limit = 1000,
+  }) async {
+    final queryParameters = <String, String>{
+      'team': team.toString(),
+      'limit': limit.toString(),
+    };
+    if (year != null) queryParameters['year'] = year.toString();
+    final body = await _get(
+      '/team_events',
+      queryParameters: queryParameters,
+    );
+    if (body == null) return const <StatboticsTeamEvent>[];
+    final list = jsonDecode(body) as List<dynamic>;
+    final results = list
+        .map(
+          (json) => StatboticsTeamEvent.fromJson(
+            (json as Map).cast<String, dynamic>(),
+          ),
+        )
+        .toList(growable: true);
+    results.sort((a, b) {
+      if (a.year != b.year) return a.year.compareTo(b.year);
+      return a.event.compareTo(b.event);
+    });
+    return results;
+  }
+
   /// `GET /v3/events?year={year}` — returns all events for the given year,
   /// sorted by week then name.
   Future<List<StatboticsEvent>> getEvents(int year) async {
