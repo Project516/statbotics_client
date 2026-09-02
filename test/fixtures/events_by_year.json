@@ -1,0 +1,114 @@
+[
+    {
+        "key": "2025alhu",
+        "year": 2025,
+        "name": "Rocket City Regional",
+        "time": 1741752000,
+        "country": "USA",
+        "state": "AL",
+        "district": null,
+        "start_date": "2025-03-12",
+        "end_date": "2025-03-15",
+        "type": "regional",
+        "week": 3,
+        "video": "https://www.twitch.tv/firstinspires5",
+        "status": "Completed",
+        "status_str": "Completed",
+        "num_teams": 44,
+        "current_match": 96,
+        "qual_matches": 81,
+        "epa": {
+            "max": 65.62,
+            "top_8": 35.42,
+            "top_24": 18.9,
+            "mean": 24.72,
+            "sd": 14.48
+        },
+        "metrics": {
+            "win_prob": {
+                "count": 96,
+                "conf": 0.6675,
+                "acc": 0.7604,
+                "mse": 0.1556
+            },
+            "score_pred": {
+                "count": 192,
+                "rmse": 22.7338,
+                "error": -2.1215
+            },
+            "rp_pred": {
+                "count": 162,
+                "auto_rp": {
+                    "error": -0.0681,
+                    "acc": 0.6605
+                },
+                "coral_rp": {
+                    "error": -0.0109,
+                    "acc": 0.9259
+                },
+                "barge_rp": [
+                    {
+                        "error": -0.0472,
+                        "acc": 0.6296
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "key": "2025arc",
+        "year": 2025,
+        "name": "Archimedes Division",
+        "time": 1744776000,
+        "country": "USA",
+        "state": "TX",
+        "district": null,
+        "start_date": "2025-04-16",
+        "end_date": "2025-04-19",
+        "type": "champs_div",
+        "week": 8,
+        "video": "https://www.twitch.tv/firstinspires_archimedes",
+        "status": "Completed",
+        "status_str": "Completed",
+        "num_teams": 75,
+        "current_match": 140,
+        "qual_matches": 125,
+        "epa": {
+            "max": 101.05,
+            "top_8": 84.65,
+            "top_24": 71.8,
+            "mean": 59.92,
+            "sd": 19.85
+        },
+        "metrics": {
+            "win_prob": {
+                "count": 140,
+                "conf": 0.7556,
+                "acc": 0.8,
+                "mse": 0.1377
+            },
+            "score_pred": {
+                "count": 280,
+                "rmse": 23.7671,
+                "error": 1.1597
+            },
+            "rp_pred": {
+                "count": 250,
+                "auto_rp": {
+                    "error": -0.0274,
+                    "acc": 0.956
+                },
+                "coral_rp": {
+                    "error": -0.0386,
+                    "acc": 0.78
+                },
+                "barge_rp": [
+                    {
+                        "error": 0.0081,
+                        "acc": 0.788
+                    }
+                ]
+            }
+        }
+    }
+]

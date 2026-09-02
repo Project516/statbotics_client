@@ -72,8 +72,8 @@ class StatboticsClient {
   /// just drops the `event` filter and adds `team` (and optionally `year`),
   /// answering with every row that mentions the team instead of every row for
   /// one event. Results are sorted by year descending, then event key
-  /// ascending. Returns an empty list on 404 (an unknown team number) or if
-  /// the team has no recorded events.
+  /// ascending. A team Statbotics has no events for answers 200 with `[]`, so
+  /// an unknown team number is an empty list rather than an error.
   ///
   /// The 1000-row cap is fixed rather than a parameter, the way the other
   /// list methods fix theirs: a team plays a handful of events a season, so
@@ -102,6 +102,39 @@ class StatboticsClient {
       if (a.year != b.year) return b.year.compareTo(a.year);
       return a.event.compareTo(b.event);
     });
+    return results;
+  }
+
+  /// `GET /v3/team_years?team={team}&limit=100` — returns one row per season
+  /// the team competed in, newest season first.
+  ///
+  /// The season-over-season view [getTeamEvents] cannot give: that one answers
+  /// per event within a season, this one answers per season. A team Statbotics
+  /// has no seasons for answers 200 with `[]`, so an unknown team number is an
+  /// empty list rather than an error. A [team] of 100000 or more is rejected
+  /// with HTTP 422 and throws [StatboticsApiException]: that is a malformed
+  /// request, not an unknown team.
+  ///
+  /// The 100-row cap is fixed the way the other list methods fix theirs. FRC
+  /// has run since 1992, so no team has more seasons than that.
+  Future<List<StatboticsTeamYear>> getTeamYears(int team) async {
+    final body = await _get(
+      '/team_years',
+      queryParameters: <String, String>{
+        'team': team.toString(),
+        'limit': '100',
+      },
+    );
+    if (body == null) return const <StatboticsTeamYear>[];
+    final list = jsonDecode(body) as List<dynamic>;
+    final results = list
+        .map(
+          (json) => StatboticsTeamYear.fromJson(
+            (json as Map).cast<String, dynamic>(),
+          ),
+        )
+        .toList(growable: true);
+    results.sort((a, b) => b.year.compareTo(a.year));
     return results;
   }
 

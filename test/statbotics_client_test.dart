@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:test/test.dart';
 import 'package:http/http.dart' as http;
@@ -98,13 +99,12 @@ void main() {
               'event': '2026mrcmp',
               'event_name': 'Mid-Atlantic Championship',
               'year': 2026,
-              'wins': 8,
-              'losses': 4,
-              'ties': 0,
-              'rank': 2,
-              'num_teams': 40,
+              'record': <String, dynamic>{
+                'qual': <String, dynamic>{'rank': 2, 'num_teams': 40},
+                'total': <String, dynamic>{'wins': 8, 'losses': 4, 'ties': 0},
+              },
               'epa': <String, dynamic>{
-                'total_points': <String, dynamic>{'mean': 42.1, 'sd': 3.0},
+                'total_points': 42.1,
               },
             },
             <String, dynamic>{
@@ -112,13 +112,12 @@ void main() {
               'event': '2026mrcmp',
               'event_name': 'Mid-Atlantic Championship',
               'year': 2026,
-              'wins': 10,
-              'losses': 2,
-              'ties': 0,
-              'rank': 1,
-              'num_teams': 40,
+              'record': <String, dynamic>{
+                'qual': <String, dynamic>{'rank': 1, 'num_teams': 40},
+                'total': <String, dynamic>{'wins': 10, 'losses': 2, 'ties': 0},
+              },
               'epa': <String, dynamic>{
-                'total_points': <String, dynamic>{'mean': 48.5, 'sd': 2.8},
+                'total_points': 48.5,
               },
             },
           ]),
@@ -134,7 +133,7 @@ void main() {
       // Sorted by rank ascending: rank 1 first.
       expect(teams[0].team, 1234);
       expect(teams[0].rank, 1);
-      expect(teams[0].epa.totalPointsMean, closeTo(48.5, 0.01));
+      expect(teams[0].epa.totalPoints, closeTo(48.5, 0.01));
       expect(teams[0].record, '10-2');
       expect(teams[1].team, 2714);
       expect(teams[1].rank, 2);
@@ -157,9 +156,9 @@ void main() {
         'event_name': 'Houston',
         'team_name': 'Spectrum',
         'year': 2026,
-        'wins': 1,
-        'losses': 0,
-        'ties': 0,
+        'record': <String, dynamic>{
+          'total': <String, dynamic>{'wins': 1, 'losses': 0, 'ties': 0},
+        },
         'epa': <String, dynamic>{},
       });
       expect(te.teamName, 'Spectrum');
@@ -170,9 +169,9 @@ void main() {
         'team': 3847,
         'event': '2026txhou',
         'year': 2026,
-        'wins': 0,
-        'losses': 0,
-        'ties': 0,
+        'record': <String, dynamic>{
+          'total': <String, dynamic>{'wins': 0, 'losses': 0, 'ties': 0},
+        },
         'epa': <String, dynamic>{},
       });
       expect(te.teamName, isEmpty);
@@ -190,14 +189,15 @@ void main() {
         'event_name': 'Houston',
         'team_name': 'Spectrum',
         'year': 2026,
-        'wins': 1,
-        'losses': 0,
-        'ties': 0,
-        'rank': 7,
-        'num_teams': 42,
+        'record': <String, dynamic>{
+          'qual': <String, dynamic>{'rank': 7, 'num_teams': 42},
+          'total': <String, dynamic>{'wins': 1, 'losses': 0, 'ties': 0},
+        },
         'epa': <String, dynamic>{
-          'total_points': <String, dynamic>{'mean': 41.2, 'sd': 2.9},
-          'auto_points': <String, dynamic>{'mean': 9.5},
+          'total_points': 41.2,
+          'unitless': 1710.0,
+          'norm': 1655.0,
+          'breakdown': <String, dynamic>{'auto_points': 9.5},
         },
       });
       final restored = StatboticsTeamEvent.fromJson(original.toJson());
@@ -211,8 +211,8 @@ void main() {
       expect(restored.ties, 0);
       expect(restored.rank, 7);
       expect(restored.numTeams, 42);
-      expect(restored.epa.totalPointsMean, closeTo(41.2, 0.01));
-      expect(restored.epa.autoPointsMean, closeTo(9.5, 0.01));
+      expect(restored.epa.totalPoints, closeTo(41.2, 0.01));
+      expect(restored.epa.autoPoints, closeTo(9.5, 0.01));
     });
 
     test('StatboticsTeamEvent.toJson round-trips an empty team_name', () {
@@ -221,9 +221,9 @@ void main() {
         'event': '2026x',
         'event_name': 'X',
         'year': 2026,
-        'wins': 0,
-        'losses': 0,
-        'ties': 0,
+        'record': <String, dynamic>{
+          'total': <String, dynamic>{'wins': 0, 'losses': 0, 'ties': 0},
+        },
         'epa': <String, dynamic>{},
       });
       final restored = StatboticsTeamEvent.fromJson(original.toJson());
@@ -236,9 +236,9 @@ void main() {
         'event': 'test',
         'event_name': 'Test',
         'year': 2026,
-        'wins': 6,
-        'losses': 3,
-        'ties': 0,
+        'record': <String, dynamic>{
+          'total': <String, dynamic>{'wins': 6, 'losses': 3, 'ties': 0},
+        },
         'epa': <String, dynamic>{},
       });
       expect(te.record, '6-3');
@@ -250,9 +250,9 @@ void main() {
         'event': 'test',
         'event_name': 'Test',
         'year': 2026,
-        'wins': 5,
-        'losses': 3,
-        'ties': 1,
+        'record': <String, dynamic>{
+          'total': <String, dynamic>{'wins': 5, 'losses': 3, 'ties': 1},
+        },
         'epa': <String, dynamic>{},
       });
       expect(te.record, '5-3-1');
@@ -264,12 +264,12 @@ void main() {
         'event': 'test',
         'event_name': 'Test',
         'year': 2026,
-        'wins': 0,
-        'losses': 0,
-        'ties': 0,
+        'record': <String, dynamic>{
+          'total': <String, dynamic>{'wins': 0, 'losses': 0, 'ties': 0},
+        },
         'epa': <String, dynamic>{},
       });
-      expect(te.epa.totalPointsMean, isNull);
+      expect(te.epa.totalPoints, isNull);
     });
 
     test('StatboticsMatch parses team_keys from alliances', () {
@@ -571,13 +571,12 @@ void main() {
               'event_name': 'Cal Games',
               'team_name': 'The Cheesy Poofs',
               'year': 2024,
-              'wins': 9,
-              'losses': 1,
-              'ties': 0,
-              'rank': 1,
-              'num_teams': 40,
+              'record': <String, dynamic>{
+                'qual': <String, dynamic>{'rank': 1, 'num_teams': 40},
+                'total': <String, dynamic>{'wins': 9, 'losses': 1, 'ties': 0},
+              },
               'epa': <String, dynamic>{
-                'total_points': <String, dynamic>{'mean': 55.0, 'sd': 2.0},
+                'total_points': 55.0,
               },
             },
             <String, dynamic>{
@@ -586,13 +585,12 @@ void main() {
               'event_name': 'Cal Games',
               'team_name': 'The Cheesy Poofs',
               'year': 2023,
-              'wins': 8,
-              'losses': 2,
-              'ties': 0,
-              'rank': 2,
-              'num_teams': 40,
+              'record': <String, dynamic>{
+                'qual': <String, dynamic>{'rank': 2, 'num_teams': 40},
+                'total': <String, dynamic>{'wins': 8, 'losses': 2, 'ties': 0},
+              },
               'epa': <String, dynamic>{
-                'total_points': <String, dynamic>{'mean': 50.0, 'sd': 2.5},
+                'total_points': 50.0,
               },
             },
             <String, dynamic>{
@@ -601,13 +599,12 @@ void main() {
               'event_name': 'Austin',
               'team_name': 'The Cheesy Poofs',
               'year': 2024,
-              'wins': 7,
-              'losses': 3,
-              'ties': 0,
-              'rank': 3,
-              'num_teams': 38,
+              'record': <String, dynamic>{
+                'qual': <String, dynamic>{'rank': 3, 'num_teams': 38},
+                'total': <String, dynamic>{'wins': 7, 'losses': 3, 'ties': 0},
+              },
               'epa': <String, dynamic>{
-                'total_points': <String, dynamic>{'mean': 52.0, 'sd': 2.2},
+                'total_points': 52.0,
               },
             },
           ]),
@@ -655,6 +652,182 @@ void main() {
       );
       final history = await client.getTeamEvents(999999);
       expect(history, isEmpty);
+    });
+  });
+
+  fixtureTests();
+}
+
+/// Decodes a captured response body from `test/fixtures/`.
+///
+/// These are real `api.statbotics.io/v3` bodies, saved verbatim on
+/// 2026-09-02. The hand-written maps above are readable but they are also
+/// the author's belief about the API, and a model can satisfy every one of
+/// them while failing on the real thing: that is how the client came to read
+/// `epa.total_points` as a `{mean, sd}` object it has never been. Assert
+/// against a captured body, and a shape change fails a test instead of
+/// reaching a device.
+///
+/// Refresh one with, for example:
+/// `curl -s 'https://api.statbotics.io/v3/team_years?team=254&limit=2'`
+Object _fixture(String name) {
+  return jsonDecode(File('test/fixtures/$name.json').readAsStringSync());
+}
+
+List<Map<String, dynamic>> _fixtureList(String name) {
+  return (_fixture(name) as List<dynamic>)
+      .map((e) => (e as Map).cast<String, dynamic>())
+      .toList(growable: false);
+}
+
+/// Every model, run against a captured live body rather than a hand-written
+/// one.
+void fixtureTests() {
+  group('captured live responses', () {
+    test('StatboticsTeamEvent decodes a real /team_events row', () {
+      final rows = _fixtureList('team_events_by_event');
+      final te = StatboticsTeamEvent.fromJson(rows.first);
+
+      expect(te.team, greaterThan(0));
+      expect(te.event, '2025cabe');
+      expect(te.eventName, isNotEmpty);
+      expect(te.teamName, isNotEmpty);
+      expect(te.year, 2025);
+      // The regression this file exists to catch: every one of these reads a
+      // nested or bare field the client previously looked for in the wrong
+      // place, so each would be null or zero against a live body.
+      expect(te.epa.totalPoints, isNotNull);
+      expect(te.epa.autoPoints, isNotNull);
+      expect(te.epa.teleopPoints, isNotNull);
+      expect(te.epa.endgamePoints, isNotNull);
+      expect(te.rank, isNotNull);
+      expect(te.numTeams, isNotNull);
+      expect(te.wins + te.losses + te.ties, greaterThan(0));
+    });
+
+    test('a real /team_events row survives the cache round-trip', () {
+      final original = StatboticsTeamEvent.fromJson(
+        _fixtureList('team_events_by_event').first,
+      );
+      final restored = StatboticsTeamEvent.fromJson(original.toJson());
+
+      expect(restored.team, original.team);
+      expect(restored.teamName, original.teamName);
+      expect(restored.eventName, original.eventName);
+      expect(restored.record, original.record);
+      expect(restored.rank, original.rank);
+      expect(restored.numTeams, original.numTeams);
+      expect(restored.epa.totalPoints, original.epa.totalPoints);
+      expect(restored.epa.autoPoints, original.epa.autoPoints);
+      expect(restored.epa.teleopPoints, original.epa.teleopPoints);
+      expect(restored.epa.endgamePoints, original.epa.endgamePoints);
+    });
+
+    test('a team-filtered /team_events row decodes the same way', () {
+      final rows = _fixtureList('team_events_by_team');
+      final te = StatboticsTeamEvent.fromJson(rows.first);
+
+      expect(te.team, 254);
+      expect(te.epa.totalPoints, isNotNull);
+      expect(te.eventName, isNotEmpty);
+    });
+
+    test('StatboticsTeamYear decodes a real /team_years row', () {
+      final rows = _fixtureList('team_years_by_team');
+      final ty = StatboticsTeamYear.fromJson(rows.first);
+
+      expect(ty.team, 254);
+      expect(ty.year, greaterThan(1991));
+      expect(ty.name, isNotEmpty);
+      // /team_years reports the record flat, unlike /team_events.
+      expect(ty.wins + ty.losses + ty.ties, greaterThan(0));
+      expect(ty.epa.totalPoints, isNotNull);
+      expect(ty.epa.unitless, isNotNull);
+      expect(ty.epa.norm, isNotNull);
+      expect(ty.epaRank, isNotNull);
+      expect(ty.epaRankTeamCount, isNotNull);
+    });
+
+    test('a real /team_years row survives the cache round-trip', () {
+      final original = StatboticsTeamYear.fromJson(
+        _fixtureList('team_years_by_team').first,
+      );
+      final restored = StatboticsTeamYear.fromJson(original.toJson());
+
+      expect(restored.team, original.team);
+      expect(restored.year, original.year);
+      expect(restored.name, original.name);
+      expect(restored.record, original.record);
+      expect(restored.epaRank, original.epaRank);
+      expect(restored.epaRankTeamCount, original.epaRankTeamCount);
+      expect(restored.epa.totalPoints, original.epa.totalPoints);
+      expect(restored.epa.unitless, original.epa.unitless);
+      expect(restored.epa.norm, original.epa.norm);
+    });
+
+    test('an early season has no per-phase breakdown and reads as null', () {
+      // 2002 predates the auto/teleop/endgame split, so breakdown carries
+      // total_points alone. Nullable fields, not zeros.
+      final early = _fixtureList('team_years_by_team')
+          .map(StatboticsTeamYear.fromJson)
+          .firstWhere((ty) => ty.year < 2010);
+
+      expect(early.epa.totalPoints, isNotNull);
+      expect(early.epa.autoPoints, isNull);
+      expect(early.epa.teleopPoints, isNull);
+      expect(early.epa.endgamePoints, isNull);
+    });
+
+    test('StatboticsMatch decodes a real /matches row', () {
+      final rows = _fixtureList('matches_by_event');
+      final match = StatboticsMatch.fromJson(rows.first);
+
+      expect(match.key, startsWith('2025cabe_'));
+      expect(match.event, '2025cabe');
+      expect(match.compLevel, isNotEmpty);
+      expect(match.redTeams, hasLength(3));
+      expect(match.blueTeams, hasLength(3));
+      expect(match.allTeams.every((t) => t > 0), isTrue);
+    });
+
+    test('StatboticsEvent decodes a real /events row', () {
+      final rows = _fixtureList('events_by_year');
+      final event = StatboticsEvent.fromJson(rows.first);
+
+      expect(event.key, isNotEmpty);
+      expect(event.name, isNotEmpty);
+      expect(event.year, 2025);
+      expect(event.week, isNotNull);
+      expect(event.startDate, isNotNull);
+      expect(event.endDate, isNotNull);
+    });
+
+    test('StatboticsEvent decodes a real /event/{key} body', () {
+      final event = StatboticsEvent.fromJson(
+        (_fixture('event') as Map).cast<String, dynamic>(),
+      );
+
+      expect(event.key, '2025cabe');
+      expect(event.name, isNotEmpty);
+      expect(event.year, 2025);
+    });
+
+    test('StatboticsTeamBasic decodes a real /teams row', () {
+      final rows = _fixtureList('teams');
+      final team = StatboticsTeamBasic.fromJson(rows.first);
+
+      expect(team.team, greaterThan(0));
+      expect(team.nickname, isNotEmpty);
+    });
+
+    test('an EPA object cached by an older client still reads', () {
+      // A last-good cache (#512) written before the shape fix carries
+      // total_points as {mean, sd}. Reading it must not throw on upgrade.
+      final legacy = StatboticsEpa.fromJson(<String, dynamic>{
+        'total_points': <String, dynamic>{'mean': 41.2, 'sd': 2.9},
+      });
+
+      expect(legacy.totalPoints, closeTo(41.2, 0.01));
     });
   });
 }

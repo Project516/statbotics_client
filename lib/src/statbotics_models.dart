@@ -175,39 +175,62 @@ class StatboticsEvent {
   }
 }
 
-/// EPA (Expected Points Added) breakdown for a team at an event.
+/// A number the API may report either bare or wrapped in a `{mean: ...}`
+/// object.
+///
+/// v3 reports EPA measures bare. The wrapped form only turns up in a
+/// last-good cache written by an older client (#512), so reading both keeps an
+/// upgrade from throwing on the first cache read.
+double? _readMeasure(Object? raw) {
+  if (raw is num) return raw.toDouble();
+  if (raw is Map) return (raw['mean'] as num?)?.toDouble();
+  return null;
+}
+
+/// EPA (Expected Points Added) for a team, as `/team_events` and
+/// `/team_years` report it.
+///
+/// [totalPoints] is the point estimate the API puts at `epa.total_points`,
+/// not an average over matches -- `epa.stats.mean` is a different number and
+/// this model does not carry it. The per-phase measures live under
+/// `epa.breakdown` and are absent for seasons predating that game's scoring
+/// split, so every field here is nullable.
 class StatboticsEpa {
   const StatboticsEpa({
-    this.totalPointsMean,
-    this.totalPointsSd,
-    this.autoPointsMean,
-    this.teleopPointsMean,
-    this.endgamePointsMean,
+    this.totalPoints,
+    this.unitless,
+    this.norm,
+    this.autoPoints,
+    this.teleopPoints,
+    this.endgamePoints,
   });
 
   factory StatboticsEpa.fromJson(Map<String, dynamic> json) {
-    final total =
-        (json['total_points'] as Map?)?.cast<String, dynamic>() ?? const {};
-    final auto =
-        (json['auto_points'] as Map?)?.cast<String, dynamic>() ?? const {};
-    final teleop =
-        (json['teleop_points'] as Map?)?.cast<String, dynamic>() ?? const {};
-    final endgame =
-        (json['endgame_points'] as Map?)?.cast<String, dynamic>() ?? const {};
+    final breakdown =
+        (json['breakdown'] as Map?)?.cast<String, dynamic>() ?? const {};
     return StatboticsEpa(
-      totalPointsMean: (total['mean'] as num?)?.toDouble(),
-      totalPointsSd: (total['sd'] as num?)?.toDouble(),
-      autoPointsMean: (auto['mean'] as num?)?.toDouble(),
-      teleopPointsMean: (teleop['mean'] as num?)?.toDouble(),
-      endgamePointsMean: (endgame['mean'] as num?)?.toDouble(),
+      totalPoints: _readMeasure(json['total_points']),
+      unitless: (json['unitless'] as num?)?.toDouble(),
+      norm: (json['norm'] as num?)?.toDouble(),
+      autoPoints: _readMeasure(breakdown['auto_points']),
+      teleopPoints: _readMeasure(breakdown['teleop_points']),
+      endgamePoints: _readMeasure(breakdown['endgame_points']),
     );
   }
 
-  final double? totalPointsMean;
-  final double? totalPointsSd;
-  final double? autoPointsMean;
-  final double? teleopPointsMean;
-  final double? endgamePointsMean;
+  /// The team's EPA in game points.
+  final double? totalPoints;
+
+  /// The unitless EPA scale, comparable across seasons where [totalPoints] is
+  /// not, since a season's point values are its own.
+  final double? unitless;
+
+  /// The normalized EPA scale, centred so 1500 is an average team.
+  final double? norm;
+
+  final double? autoPoints;
+  final double? teleopPoints;
+  final double? endgamePoints;
 
   static const StatboticsEpa empty = StatboticsEpa();
 
@@ -215,13 +238,14 @@ class StatboticsEpa {
   /// last-good cache (#512).
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
-      'total_points': <String, dynamic>{
-        'mean': totalPointsMean,
-        'sd': totalPointsSd,
+      'total_points': totalPoints,
+      'unitless': unitless,
+      'norm': norm,
+      'breakdown': <String, dynamic>{
+        'auto_points': autoPoints,
+        'teleop_points': teleopPoints,
+        'endgame_points': endgamePoints,
       },
-      'auto_points': <String, dynamic>{'mean': autoPointsMean},
-      'teleop_points': <String, dynamic>{'mean': teleopPointsMean},
-      'endgame_points': <String, dynamic>{'mean': endgamePointsMean},
     };
   }
 }
@@ -244,17 +268,22 @@ class StatboticsTeamEvent {
 
   factory StatboticsTeamEvent.fromJson(Map<String, dynamic> json) {
     final rawEpa = (json['epa'] as Map?)?.cast<String, dynamic>();
+    final record =
+        (json['record'] as Map?)?.cast<String, dynamic>() ?? const {};
+    final total =
+        (record['total'] as Map?)?.cast<String, dynamic>() ?? const {};
+    final qual = (record['qual'] as Map?)?.cast<String, dynamic>() ?? const {};
     return StatboticsTeamEvent(
       team: (json['team'] as num?)?.toInt() ?? 0,
       event: (json['event'] as String?) ?? '',
       eventName: (json['event_name'] as String?) ?? '',
       teamName: (json['team_name'] as String?) ?? '',
       year: (json['year'] as num?)?.toInt() ?? 0,
-      wins: (json['wins'] as num?)?.toInt() ?? 0,
-      losses: (json['losses'] as num?)?.toInt() ?? 0,
-      ties: (json['ties'] as num?)?.toInt() ?? 0,
-      rank: (json['rank'] as num?)?.toInt(),
-      numTeams: (json['num_teams'] as num?)?.toInt(),
+      wins: (total['wins'] as num?)?.toInt() ?? 0,
+      losses: (total['losses'] as num?)?.toInt() ?? 0,
+      ties: (total['ties'] as num?)?.toInt() ?? 0,
+      rank: (qual['rank'] as num?)?.toInt(),
+      numTeams: (qual['num_teams'] as num?)?.toInt(),
       epa:
           rawEpa != null ? StatboticsEpa.fromJson(rawEpa) : StatboticsEpa.empty,
     );
@@ -272,9 +301,15 @@ class StatboticsTeamEvent {
   /// omits it.
   final String teamName;
   final int year;
+
+  /// Won-lost-tied over the whole event, quals and elims together, from
+  /// `record.total`.
   final int wins;
   final int losses;
   final int ties;
+
+  /// Qualification rank and field size, from `record.qual`. Null before the
+  /// event has ranked anyone, and for an event Statbotics has no record of.
   final int? rank;
   final int? numTeams;
   final StatboticsEpa epa;
@@ -288,12 +323,104 @@ class StatboticsTeamEvent {
       'event_name': eventName,
       'team_name': teamName,
       'year': year,
-      'wins': wins,
-      'losses': losses,
-      'ties': ties,
-      'rank': rank,
-      'num_teams': numTeams,
+      'record': <String, dynamic>{
+        'qual': <String, dynamic>{'rank': rank, 'num_teams': numTeams},
+        'total': <String, dynamic>{
+          'wins': wins,
+          'losses': losses,
+          'ties': ties,
+        },
+      },
       'epa': epa.toJson(),
+    };
+  }
+
+  String get record => '$wins-$losses${ties > 0 ? '-$ties' : ''}';
+}
+
+/// One team's season, as `/team_years` reports it.
+///
+/// The season-over-season counterpart to [StatboticsTeamEvent]: one row per
+/// year a team competed, carrying that season's EPA and record.
+///
+/// Compare seasons on [StatboticsEpa.unitless] or [StatboticsEpa.norm] rather
+/// than [StatboticsEpa.totalPoints]. Point values belong to a season's game,
+/// so a 2002 total of 16.6 and a 2025 total of 92.77 say nothing about which
+/// robot was better.
+class StatboticsTeamYear {
+  StatboticsTeamYear({
+    required this.team,
+    required this.year,
+    this.name = '',
+    required this.wins,
+    required this.losses,
+    required this.ties,
+    this.epaRank,
+    this.epaRankTeamCount,
+    required this.epa,
+  });
+
+  factory StatboticsTeamYear.fromJson(Map<String, dynamic> json) {
+    final rawEpa = (json['epa'] as Map?)?.cast<String, dynamic>();
+    // Flat here, unlike `/team_events`, which splits the record into
+    // qual/elim/total.
+    final record =
+        (json['record'] as Map?)?.cast<String, dynamic>() ?? const {};
+    final ranks =
+        (rawEpa?['ranks'] as Map?)?.cast<String, dynamic>() ?? const {};
+    final total = (ranks['total'] as Map?)?.cast<String, dynamic>() ?? const {};
+    return StatboticsTeamYear(
+      team: (json['team'] as num?)?.toInt() ?? 0,
+      year: (json['year'] as num?)?.toInt() ?? 0,
+      name: (json['name'] as String?) ?? '',
+      wins: (record['wins'] as num?)?.toInt() ?? 0,
+      losses: (record['losses'] as num?)?.toInt() ?? 0,
+      ties: (record['ties'] as num?)?.toInt() ?? 0,
+      epaRank: (total['rank'] as num?)?.toInt(),
+      epaRankTeamCount: (total['team_count'] as num?)?.toInt(),
+      epa:
+          rawEpa != null ? StatboticsEpa.fromJson(rawEpa) : StatboticsEpa.empty,
+    );
+  }
+
+  final int team;
+  final int year;
+
+  /// The team's nickname for that season.
+  final String name;
+
+  /// Won-lost-tied across the whole season.
+  final int wins;
+  final int losses;
+  final int ties;
+
+  /// Where this season's EPA placed the team worldwide, from
+  /// `epa.ranks.total`, with the number of teams it was ranked against.
+  final int? epaRank;
+  final int? epaRankTeamCount;
+
+  final StatboticsEpa epa;
+
+  /// Round-trips through [StatboticsTeamYear.fromJson] for the on-device
+  /// last-good cache (#512).
+  Map<String, dynamic> toJson() {
+    final epaJson = epa.toJson();
+    epaJson['ranks'] = <String, dynamic>{
+      'total': <String, dynamic>{
+        'rank': epaRank,
+        'team_count': epaRankTeamCount,
+      },
+    };
+    return <String, dynamic>{
+      'team': team,
+      'year': year,
+      'name': name,
+      'record': <String, dynamic>{
+        'wins': wins,
+        'losses': losses,
+        'ties': ties,
+      },
+      'epa': epaJson,
     };
   }
 
