@@ -1,0 +1,162 @@
+[
+    {
+        "team": 199,
+        "year": 2025,
+        "event": "2025cabe",
+        "time": 1743652800,
+        "team_name": "Deep Blue",
+        "event_name": "East Bay Regional",
+        "country": "USA",
+        "state": "CA",
+        "district": null,
+        "type": "regional",
+        "week": 6,
+        "status": "Completed",
+        "first_event": false,
+        "epa": {
+            "total_points": 25.32,
+            "unitless": 1484.0,
+            "norm": 1494.0,
+            "breakdown": {
+                "total_points": 25.32,
+                "auto_points": 6.1,
+                "teleop_points": 18.23,
+                "endgame_points": 1.0,
+                "auto_rp": 0.1599,
+                "coral_rp": -0.0579,
+                "barge_rp": 0.0766,
+                "tiebreaker_points": 0.0,
+                "auto_coral_points": 3.35,
+                "teleop_coral_points": 15.14,
+                "coral_l1": 1.1,
+                "coral_l2": 0.84,
+                "coral_l3": 0.6,
+                "coral_l4": 2.08,
+                "processor_algae": 0.07,
+                "processor_algae_points": 0.21,
+                "net_algae_points": 2.88,
+                "barge_points": 1.0,
+                "rp_1": 0.1599,
+                "rp_2": -0.0579,
+                "rp_3": 0.0766,
+                "total_coral_points": 18.490000000000002,
+                "total_algae_points": 3.09
+            },
+            "stats": {
+                "start": 16.95,
+                "pre_elim": 26.84,
+                "mean": 23.11,
+                "max": 26.84
+            }
+        },
+        "record": {
+            "qual": {
+                "wins": 7,
+                "losses": 2,
+                "ties": 0,
+                "count": 9,
+                "winrate": 0.7778,
+                "rps": 37,
+                "rps_per_match": 4.1111,
+                "rank": 8,
+                "num_teams": 55
+            },
+            "elim": {
+                "wins": 0,
+                "losses": 1,
+                "ties": 0,
+                "count": 1,
+                "winrate": 0.0,
+                "alliance": null,
+                "is_captain": null
+            },
+            "total": {
+                "wins": 7,
+                "losses": 3,
+                "ties": 0,
+                "count": 10,
+                "winrate": 0.7
+            }
+        }
+    },
+    {
+        "team": 253,
+        "year": 2025,
+        "event": "2025cabe",
+        "time": 1743652800,
+        "team_name": "Boba Bots",
+        "event_name": "East Bay Regional",
+        "country": "USA",
+        "state": "CA",
+        "district": null,
+        "type": "regional",
+        "week": 6,
+        "status": "Completed",
+        "first_event": false,
+        "epa": {
+            "total_points": 23.53,
+            "unitless": 1472.0,
+            "norm": 1485.0,
+            "breakdown": {
+                "total_points": 23.53,
+                "auto_points": 3.01,
+                "teleop_points": 17.9,
+                "endgame_points": 2.62,
+                "auto_rp": 0.1382,
+                "coral_rp": -0.022,
+                "barge_rp": 0.0387,
+                "tiebreaker_points": 0.12,
+                "auto_coral_points": 0.27,
+                "teleop_coral_points": 15.32,
+                "coral_l1": 0.35,
+                "coral_l2": 1.14,
+                "coral_l3": 1.2,
+                "coral_l4": 1.32,
+                "processor_algae": 0.26,
+                "processor_algae_points": 0.78,
+                "net_algae_points": 1.81,
+                "barge_points": 2.62,
+                "rp_1": 0.1382,
+                "rp_2": -0.022,
+                "rp_3": 0.0387,
+                "total_coral_points": 15.59,
+                "total_algae_points": 2.59
+            },
+            "stats": {
+                "start": 11.45,
+                "pre_elim": 21.95,
+                "mean": 16.26,
+                "max": 21.95
+            }
+        },
+        "record": {
+            "qual": {
+                "wins": 5,
+                "losses": 4,
+                "ties": 0,
+                "count": 9,
+                "winrate": 0.5556,
+                "rps": 28,
+                "rps_per_match": 3.1111,
+                "rank": 25,
+                "num_teams": 55
+            },
+            "elim": {
+                "wins": 0,
+                "losses": 0,
+                "ties": 0,
+                "count": 0,
+                "winrate": 0,
+                "alliance": null,
+                "is_captain": null
+            },
+            "total": {
+                "wins": 5,
+                "losses": 4,
+                "ties": 0,
+                "count": 9,
+                "winrate": 0.5556
+            }
+        }
+    }
+]

@@ -1,0 +1,104 @@
+[
+    {
+        "team": 254,
+        "year": 2002,
+        "name": "The Cheesy Poofs",
+        "country": "USA",
+        "state": "CA",
+        "district": null,
+        "rookie_year": 1999,
+        "epa": {
+            "total_points": 16.6,
+            "unitless": 1657.0,
+            "norm": 1691.0,
+            "breakdown": {
+                "total_points": 16.6
+            },
+            "stats": {
+                "start": 11.96,
+                "pre_champs": 16.6,
+                "max": 16.6
+            },
+            "ranks": {
+                "total": {
+                    "rank": 30,
+                    "percentile": 0.9532,
+                    "team_count": 641
+                },
+                "country": {
+                    "rank": 30,
+                    "percentile": 0.9511,
+                    "team_count": 613
+                },
+                "state": {
+                    "rank": 1,
+                    "percentile": 0.9868,
+                    "team_count": 76
+                },
+                "district": {
+                    "rank": 30,
+                    "percentile": 0.9532,
+                    "team_count": 641
+                }
+            }
+        },
+        "record": {
+            "wins": 18,
+            "losses": 6,
+            "ties": 1,
+            "count": 25,
+            "winrate": 0.74
+        }
+    },
+    {
+        "team": 254,
+        "year": 2003,
+        "name": "The Cheesy Poofs",
+        "country": "USA",
+        "state": "CA",
+        "district": null,
+        "rookie_year": 1999,
+        "epa": {
+            "total_points": 40.22,
+            "unitless": 1692.0,
+            "norm": 1705.0,
+            "breakdown": {
+                "total_points": 40.22
+            },
+            "stats": {
+                "start": 30.63,
+                "pre_champs": 39.23,
+                "max": 44.93
+            },
+            "ranks": {
+                "total": {
+                    "rank": 31,
+                    "percentile": 0.9605,
+                    "team_count": 785
+                },
+                "country": {
+                    "rank": 31,
+                    "percentile": 0.9582,
+                    "team_count": 741
+                },
+                "state": {
+                    "rank": 2,
+                    "percentile": 0.9783,
+                    "team_count": 92
+                },
+                "district": {
+                    "rank": 31,
+                    "percentile": 0.9605,
+                    "team_count": 785
+                }
+            }
+        },
+        "record": {
+            "wins": 29,
+            "losses": 17,
+            "ties": 0,
+            "count": 46,
+            "winrate": 0.6304
+        }
+    }
+]

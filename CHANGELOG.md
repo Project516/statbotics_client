@@ -1,13 +1,51 @@
 # Changelog
 
-## Unreleased
+## 0.4.0
 
-- Added `getTeamEvents(team, {year})` for a team's full Statbotics history
-  across events (part of issue #9). It reuses the `/team_events` endpoint with
-  a `team` filter instead of `event`, and optionally a `year`, returning every
-  team-event row for that team sorted newest season first, then by event key.
-  List endpoints return an empty list on 404, so an unknown team or a team
-  with no recorded events answers with an empty list rather than throwing.
+Breaking. The live v3 API does not send the shape this client's EPA and
+team-event models were written against, so `getEventTeams` threw a
+`TypeError` on every real response. Statbotics answered HTTP 500 on every
+data endpoint from 2026-06-15 to around 2026-09-02, which is why nothing
+caught it sooner: the models could not be exercised against a live body, and
+the tests asserted against hand-written maps that agreed with the models
+rather than with the API.
+
+- `StatboticsEpa` now decodes the shape the API sends. `epa.total_points` is
+  a bare number, not a `{mean, sd}` object, and the per-phase measures live
+  under `epa.breakdown`. Renamed to match: `totalPointsMean` ->
+  `totalPoints`, `autoPointsMean` -> `autoPoints`, `teleopPointsMean` ->
+  `teleopPoints`, `endgamePointsMean` -> `endgamePoints`. Added `unitless`
+  and `norm`, the cross-season comparable scales. Removed `totalPointsSd`,
+  which the API no longer reports anywhere.
+- `StatboticsTeamEvent` reads its record from the nested `record` object:
+  `wins`/`losses`/`ties` from `record.total`, and `rank`/`numTeams` from
+  `record.qual`. They were previously read as top-level fields, which the
+  API has no such thing as, so every one decoded to 0 or null.
+- Added `getTeamYears(team)` and `StatboticsTeamYear` for season-over-season
+  history, completing issue #9. One row per season with that season's EPA,
+  record, and worldwide EPA rank. Note `/team_years` reports its record flat,
+  unlike `/team_events`.
+- No cache migration, deliberately. An on-device last-good cache (#512)
+  cannot hold team-event data written by an earlier version: the cache writer
+  requires a successful decode, decoding threw on every live response, and
+  every release of this package (0.1.0 on 2026-08-05 onward) shipped inside
+  the outage. A consumer that reads an old record gets a decode miss its own
+  cache layer already treats as no cache.
+- Model tests now assert against captured live response bodies in
+  `test/fixtures/`, so an API shape change fails a test.
+- Corrected two doc comments: an unknown team number answers 200 with `[]`,
+  not 404. A team number of 100000 or more is rejected with HTTP 422.
+- Includes `getTeamEvents(team, {year})`, merged but never released under
+  0.3.2: a team's history across events, from `/team_events` with a `team`
+  filter, sorted newest season first then by event key.
+
+Migrating: rename the four EPA field reads, and drop any use of
+`totalPointsSd`. That is the whole of it. Nothing else that already existed
+moved or changed signature, so code reading `record`, `rank` or `numTeams` off
+a `StatboticsTeamEvent` needs no edit, though it was reading zeros before
+this. The rest of the release is additive: `getTeamYears`,
+`StatboticsTeamYear`, `getTeamEvents`, and the `unitless` and `norm` fields
+are all new surface no existing caller has to adopt.
 
 ## 0.3.1
 

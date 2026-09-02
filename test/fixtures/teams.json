@@ -1,0 +1,48 @@
+[
+    {
+        "team": 1,
+        "name": "The Juggernauts",
+        "country": "USA",
+        "state": "MI",
+        "district": "fim",
+        "rookie_year": 1997,
+        "active": true,
+        "last_active_year": 2026,
+        "record": {
+            "wins": 342,
+            "losses": 356,
+            "ties": 21,
+            "count": 719,
+            "winrate": 0.4903
+        },
+        "norm_epa": {
+            "current": 1432.0,
+            "recent": 1523.0,
+            "mean": 1552.0,
+            "max": 1686.0
+        }
+    },
+    {
+        "team": 4,
+        "name": "Team 4 ELEMENT",
+        "country": "USA",
+        "state": "CA",
+        "district": "ca",
+        "rookie_year": 1997,
+        "active": true,
+        "last_active_year": 2026,
+        "record": {
+            "wins": 243,
+            "losses": 270,
+            "ties": 15,
+            "count": 528,
+            "winrate": 0.4744
+        },
+        "norm_epa": {
+            "current": 1604.0,
+            "recent": 1564.0,
+            "mean": 1511.0,
+            "max": 1604.0
+        }
+    }
+]

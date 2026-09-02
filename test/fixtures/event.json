@@ -1,0 +1,56 @@
+{
+    "key": "2025cabe",
+    "year": 2025,
+    "name": "East Bay Regional",
+    "time": 1743652800,
+    "country": "USA",
+    "state": "CA",
+    "district": null,
+    "start_date": "2025-04-03",
+    "end_date": "2025-04-06",
+    "type": "regional",
+    "week": 6,
+    "video": "https://www.twitch.tv/firstinspires1",
+    "status": "Completed",
+    "status_str": "Completed",
+    "num_teams": 55,
+    "current_match": 98,
+    "qual_matches": 83,
+    "epa": {
+        "max": 91.91,
+        "top_8": 55.82,
+        "top_24": 31.3,
+        "mean": 33.56,
+        "sd": 19.09
+    },
+    "metrics": {
+        "win_prob": {
+            "count": 98,
+            "conf": 0.7532,
+            "acc": 0.8367,
+            "mse": 0.123
+        },
+        "score_pred": {
+            "count": 196,
+            "rmse": 26.2204,
+            "error": -7.2394
+        },
+        "rp_pred": {
+            "count": 166,
+            "auto_rp": {
+                "error": -0.0824,
+                "acc": 0.7289
+            },
+            "coral_rp": {
+                "error": -0.0862,
+                "acc": 0.7651
+            },
+            "barge_rp": [
+                {
+                    "error": -0.0021,
+                    "acc": 0.753
+                }
+            ]
+        }
+    }
+}

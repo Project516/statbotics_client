@@ -1,0 +1,162 @@
+[
+    {
+        "team": 254,
+        "year": 2025,
+        "event": "2025cabe",
+        "time": 1743652800,
+        "team_name": "The Cheesy Poofs",
+        "event_name": "East Bay Regional",
+        "country": "USA",
+        "state": "CA",
+        "district": null,
+        "type": "regional",
+        "week": 6,
+        "status": "Completed",
+        "first_event": false,
+        "epa": {
+            "total_points": 91.91,
+            "unitless": 1936.0,
+            "norm": 1835.0,
+            "breakdown": {
+                "total_points": 91.91,
+                "auto_points": 21.08,
+                "teleop_points": 60.24,
+                "endgame_points": 10.59,
+                "auto_rp": 0.582,
+                "coral_rp": 0.6194,
+                "barge_rp": 0.6968,
+                "tiebreaker_points": 0.15,
+                "auto_coral_points": 17.62,
+                "teleop_coral_points": 50.39,
+                "coral_l1": 2.26,
+                "coral_l2": 3.99,
+                "coral_l3": 4.69,
+                "coral_l4": 5.55,
+                "processor_algae": 0.28,
+                "processor_algae_points": 0.83,
+                "net_algae_points": 9.01,
+                "barge_points": 10.59,
+                "rp_1": 0.582,
+                "rp_2": 0.6194,
+                "rp_3": 0.6968,
+                "total_coral_points": 68.01,
+                "total_algae_points": 9.84
+            },
+            "stats": {
+                "start": 82.52,
+                "pre_elim": 89.48,
+                "mean": 87.45,
+                "max": 91.01
+            }
+        },
+        "record": {
+            "qual": {
+                "wins": 9,
+                "losses": 0,
+                "ties": 0,
+                "count": 9,
+                "winrate": 1.0,
+                "rps": 53,
+                "rps_per_match": 5.8889,
+                "rank": 1,
+                "num_teams": 55
+            },
+            "elim": {
+                "wins": 5,
+                "losses": 0,
+                "ties": 0,
+                "count": 5,
+                "winrate": 1.0,
+                "alliance": null,
+                "is_captain": null
+            },
+            "total": {
+                "wins": 14,
+                "losses": 0,
+                "ties": 0,
+                "count": 14,
+                "winrate": 1.0
+            }
+        }
+    },
+    {
+        "team": 254,
+        "year": 2025,
+        "event": "2025cada",
+        "time": 1741924800,
+        "team_name": "The Cheesy Poofs",
+        "event_name": "Sacramento Regional",
+        "country": "USA",
+        "state": "CA",
+        "district": null,
+        "type": "regional",
+        "week": 3,
+        "status": "Completed",
+        "first_event": true,
+        "epa": {
+            "total_points": 82.52,
+            "unitless": 1872.0,
+            "norm": 1776.0,
+            "breakdown": {
+                "total_points": 82.52,
+                "auto_points": 19.69,
+                "teleop_points": 51.86,
+                "endgame_points": 10.97,
+                "auto_rp": 0.5173,
+                "coral_rp": 0.349,
+                "barge_rp": 0.5737,
+                "tiebreaker_points": 0.15,
+                "auto_coral_points": 15.91,
+                "teleop_coral_points": 44.46,
+                "coral_l1": 0.83,
+                "coral_l2": 2.3,
+                "coral_l3": 4.05,
+                "coral_l4": 6.21,
+                "processor_algae": 0.2,
+                "processor_algae_points": 0.61,
+                "net_algae_points": 6.79,
+                "barge_points": 10.97,
+                "rp_1": 0.5173,
+                "rp_2": 0.349,
+                "rp_3": 0.5737,
+                "total_coral_points": 60.370000000000005,
+                "total_algae_points": 7.4
+            },
+            "stats": {
+                "start": 55.99,
+                "pre_elim": 79.59,
+                "mean": 72.31,
+                "max": 82.63
+            }
+        },
+        "record": {
+            "qual": {
+                "wins": 10,
+                "losses": 2,
+                "ties": 0,
+                "count": 12,
+                "winrate": 0.8333,
+                "rps": 58,
+                "rps_per_match": 4.8333,
+                "rank": 2,
+                "num_teams": 34
+            },
+            "elim": {
+                "wins": 5,
+                "losses": 0,
+                "ties": 0,
+                "count": 5,
+                "winrate": 1.0,
+                "alliance": null,
+                "is_captain": null
+            },
+            "total": {
+                "wins": 15,
+                "losses": 2,
+                "ties": 0,
+                "count": 17,
+                "winrate": 0.8824
+            }
+        }
+    }
+]

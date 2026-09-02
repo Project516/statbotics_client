@@ -29,12 +29,17 @@ call `close()` when you are done so the underlying HTTP client is released.
 | `getEvents(year)` | `GET /events?year={year}` | `List<StatboticsEvent>` |
 | `getEventTeams(eventKey)` | `GET /team_events?event={eventKey}` | `List<StatboticsTeamEvent>` |
 | `getTeamEvents(team, {year})` | `GET /team_events?team={team}[&year={year}]` | `List<StatboticsTeamEvent>` |
+| `getTeamYears(team)` | `GET /team_years?team={team}` | `List<StatboticsTeamYear>` |
 | `getEventTeamsBasic(eventKey)` | `GET /teams?event={eventKey}` | `List<StatboticsTeamBasic>` |
 | `getEventMatches(eventKey)` | `GET /matches?event={eventKey}` | `List<StatboticsMatch>` |
 
 - `getEventTeams` sorts results by rank ascending.
 - `getTeamEvents` sorts results newest season first, then by event key, so a
   team's most recent results lead. Pass `year` to narrow to one season.
+- `getTeamYears` sorts results newest season first, one row per season the
+  team competed in. Compare seasons on `epa.unitless` or `epa.norm`, not
+  `epa.totalPoints`: point values belong to a season's game, so a 2002 total of
+  16.6 and a 2025 total of 92.77 say nothing about which robot was better.
 - `getEvents` sorts results by week then name.
 - `getEventMatches` sorts results by comp level (`qm`, `ef`, `qf`, `sf`, `f`)
   then match number.
@@ -42,9 +47,21 @@ call `close()` when you are done so the underlying HTTP client is released.
   an empty list if the endpoint is unavailable.
 
 The API is public and read-only, so models only decode the fields each endpoint
-exposes (EPA means and standard deviations on `StatboticsTeamEvent`, alliance
-teams on `StatboticsMatch`, dates and location on `StatboticsEvent`). Each model
-also round-trips through `toJson` for caching.
+exposes (EPA and the per-phase breakdown on `StatboticsTeamEvent` and
+`StatboticsTeamYear`, alliance teams on `StatboticsMatch`, dates and location
+on `StatboticsEvent`). Each model also round-trips through `toJson` for
+caching.
+
+`StatboticsEpa.totalPoints` is the point estimate the API reports at
+`epa.total_points`, not an average over matches. The per-phase measures
+(`autoPoints`, `teleopPoints`, `endgamePoints`) come from `epa.breakdown` and
+are null for seasons predating that game's scoring split, so treat every EPA
+field as nullable.
+
+Model tests assert against captured live response bodies in `test/fixtures/`,
+not only hand-written maps, so a change to the API's shape fails a test rather
+than reaching a consumer. Refresh a fixture by re-running the `curl` in the
+comment above `_fixture` in the test file.
 
 ## Retries and backoff
 
