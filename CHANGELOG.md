@@ -25,9 +25,12 @@ rather than with the API.
   history, completing issue #9. One row per season with that season's EPA,
   record, and worldwide EPA rank. Note `/team_years` reports its record flat,
   unlike `/team_events`.
-- `StatboticsEpa.fromJson` still reads the old `{mean, sd}` form for
-  `total_points`, so a last-good cache written by an earlier version loads
-  instead of throwing on upgrade.
+- No cache migration, deliberately. An on-device last-good cache (#512)
+  cannot hold team-event data written by an earlier version: the cache writer
+  requires a successful decode, decoding threw on every live response, and
+  every release of this package (0.1.0 on 2026-08-05 onward) shipped inside
+  the outage. A consumer that reads an old record gets a decode miss its own
+  cache layer already treats as no cache.
 - Model tests now assert against captured live response bodies in
   `test/fixtures/`, so an API shape change fails a test.
 - Corrected two doc comments: an unknown team number answers 200 with `[]`,

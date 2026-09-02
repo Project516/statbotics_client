@@ -175,18 +175,6 @@ class StatboticsEvent {
   }
 }
 
-/// A number the API may report either bare or wrapped in a `{mean: ...}`
-/// object.
-///
-/// v3 reports EPA measures bare. The wrapped form only turns up in a
-/// last-good cache written by an older client (#512), so reading both keeps an
-/// upgrade from throwing on the first cache read.
-double? _readMeasure(Object? raw) {
-  if (raw is num) return raw.toDouble();
-  if (raw is Map) return (raw['mean'] as num?)?.toDouble();
-  return null;
-}
-
 /// EPA (Expected Points Added) for a team, as `/team_events` and
 /// `/team_years` report it.
 ///
@@ -209,12 +197,12 @@ class StatboticsEpa {
     final breakdown =
         (json['breakdown'] as Map?)?.cast<String, dynamic>() ?? const {};
     return StatboticsEpa(
-      totalPoints: _readMeasure(json['total_points']),
+      totalPoints: (json['total_points'] as num?)?.toDouble(),
       unitless: (json['unitless'] as num?)?.toDouble(),
       norm: (json['norm'] as num?)?.toDouble(),
-      autoPoints: _readMeasure(breakdown['auto_points']),
-      teleopPoints: _readMeasure(breakdown['teleop_points']),
-      endgamePoints: _readMeasure(breakdown['endgame_points']),
+      autoPoints: (breakdown['auto_points'] as num?)?.toDouble(),
+      teleopPoints: (breakdown['teleop_points'] as num?)?.toDouble(),
+      endgamePoints: (breakdown['endgame_points'] as num?)?.toDouble(),
     );
   }
 

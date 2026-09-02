@@ -819,15 +819,5 @@ void fixtureTests() {
       expect(team.team, greaterThan(0));
       expect(team.nickname, isNotEmpty);
     });
-
-    test('an EPA object cached by an older client still reads', () {
-      // A last-good cache (#512) written before the shape fix carries
-      // total_points as {mean, sd}. Reading it must not throw on upgrade.
-      final legacy = StatboticsEpa.fromJson(<String, dynamic>{
-        'total_points': <String, dynamic>{'mean': 41.2, 'sd': 2.9},
-      });
-
-      expect(legacy.totalPoints, closeTo(41.2, 0.01));
-    });
   });
 }
