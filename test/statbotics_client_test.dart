@@ -685,24 +685,33 @@ List<Map<String, dynamic>> _fixtureList(String name) {
 void fixtureTests() {
   group('captured live responses', () {
     test('StatboticsTeamEvent decodes a real /team_events row', () {
+      // Row order is the API's own and is not by rank: getEventTeams applies
+      // that sort itself.
       final rows = _fixtureList('team_events_by_event');
       final te = StatboticsTeamEvent.fromJson(rows.first);
 
-      expect(te.team, greaterThan(0));
+      // Pinned to the values in the captured body, not just non-null: a
+      // field read from the wrong but still populated place passes an
+      // isNotNull check. Team 199 at the 2025 East Bay Regional.
+      expect(te.team, 199);
       expect(te.event, '2025cabe');
-      expect(te.eventName, isNotEmpty);
-      expect(te.teamName, isNotEmpty);
+      expect(te.eventName, 'East Bay Regional');
+      expect(te.teamName, 'Deep Blue');
       expect(te.year, 2025);
       // The regression this file exists to catch: every one of these reads a
       // nested or bare field the client previously looked for in the wrong
       // place, so each would be null or zero against a live body.
-      expect(te.epa.totalPoints, isNotNull);
-      expect(te.epa.autoPoints, isNotNull);
-      expect(te.epa.teleopPoints, isNotNull);
-      expect(te.epa.endgamePoints, isNotNull);
-      expect(te.rank, isNotNull);
-      expect(te.numTeams, isNotNull);
-      expect(te.wins + te.losses + te.ties, greaterThan(0));
+      expect(te.epa.totalPoints, closeTo(25.32, 0.01));
+      expect(te.epa.autoPoints, closeTo(6.1, 0.01));
+      expect(te.epa.teleopPoints, closeTo(18.23, 0.01));
+      expect(te.epa.endgamePoints, closeTo(1.0, 0.01));
+      expect(te.epa.unitless, closeTo(1484.0, 0.01));
+      expect(te.epa.norm, closeTo(1494.0, 0.01));
+      // record.qual, not top level.
+      expect(te.rank, 8);
+      expect(te.numTeams, 55);
+      // record.total, so elims count too: 7-3 overall.
+      expect(te.record, '7-3');
     });
 
     test('a real /team_events row survives the cache round-trip', () {
@@ -728,24 +737,28 @@ void fixtureTests() {
       final te = StatboticsTeamEvent.fromJson(rows.first);
 
       expect(te.team, 254);
-      expect(te.epa.totalPoints, isNotNull);
-      expect(te.eventName, isNotEmpty);
+      expect(te.event, '2025cabe');
+      expect(te.eventName, 'East Bay Regional');
+      expect(te.epa.totalPoints, closeTo(91.91, 0.01));
+      expect(te.rank, 1);
     });
 
     test('StatboticsTeamYear decodes a real /team_years row', () {
       final rows = _fixtureList('team_years_by_team');
       final ty = StatboticsTeamYear.fromJson(rows.first);
 
+      // 254's first season in the captured body, values pinned.
       expect(ty.team, 254);
-      expect(ty.year, greaterThan(1991));
-      expect(ty.name, isNotEmpty);
+      expect(ty.year, 2002);
+      expect(ty.name, 'The Cheesy Poofs');
       // /team_years reports the record flat, unlike /team_events.
-      expect(ty.wins + ty.losses + ty.ties, greaterThan(0));
-      expect(ty.epa.totalPoints, isNotNull);
-      expect(ty.epa.unitless, isNotNull);
-      expect(ty.epa.norm, isNotNull);
-      expect(ty.epaRank, isNotNull);
-      expect(ty.epaRankTeamCount, isNotNull);
+      expect(ty.record, '18-6-1');
+      expect(ty.epa.totalPoints, closeTo(16.6, 0.01));
+      expect(ty.epa.unitless, closeTo(1657.0, 0.01));
+      expect(ty.epa.norm, closeTo(1691.0, 0.01));
+      // epa.ranks.total, two levels down.
+      expect(ty.epaRank, 30);
+      expect(ty.epaRankTeamCount, 641);
     });
 
     test('a real /team_years row survives the cache round-trip', () {
