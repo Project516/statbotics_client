@@ -39,9 +39,13 @@ rather than with the API.
   0.3.2: a team's history across events, from `/team_events` with a `team`
   filter, sorted newest season first then by event key.
 
-Migrating: rename the four EPA field reads. Nothing else in the public API
-changed, and code that only reads `record`, `rank` or `numTeams` off a
-`StatboticsTeamEvent` needs no edit, though it was reading zeros before.
+Migrating: rename the four EPA field reads, and drop any use of
+`totalPointsSd`. That is the whole of it. Nothing else that already existed
+moved or changed signature, so code reading `record`, `rank` or `numTeams` off
+a `StatboticsTeamEvent` needs no edit, though it was reading zeros before
+this. The rest of the release is additive: `getTeamYears`,
+`StatboticsTeamYear`, `getTeamEvents`, and the `unitless` and `norm` fields
+are all new surface no existing caller has to adopt.
 
 ## 0.3.1
 

@@ -72,8 +72,9 @@ class StatboticsClient {
   /// just drops the `event` filter and adds `team` (and optionally `year`),
   /// answering with every row that mentions the team instead of every row for
   /// one event. Results are sorted by year descending, then event key
-  /// ascending. A team Statbotics has no events for answers 200 with `[]`, so
-  /// an unknown team number is an empty list rather than an error.
+  /// ascending. For a team Statbotics has no events for, the endpoint answers
+  /// 200 with `[]`, so an unknown team number comes back as an empty list
+  /// rather than an error.
   ///
   /// The 1000-row cap is fixed rather than a parameter, the way the other
   /// list methods fix theirs: a team plays a handful of events a season, so
@@ -109,11 +110,12 @@ class StatboticsClient {
   /// the team competed in, newest season first.
   ///
   /// The season-over-season view [getTeamEvents] cannot give: that one answers
-  /// per event within a season, this one answers per season. A team Statbotics
-  /// has no seasons for answers 200 with `[]`, so an unknown team number is an
-  /// empty list rather than an error. A [team] of 100000 or more is rejected
-  /// with HTTP 422 and throws [StatboticsApiException]: that is a malformed
-  /// request, not an unknown team.
+  /// per event within a season, this one answers per season. For a team
+  /// Statbotics has no seasons for, the endpoint answers 200 with `[]`, so an
+  /// unknown team number comes back as an empty list rather than an error. A
+  /// [team] of 100000 or more is rejected with HTTP 422 and throws
+  /// [StatboticsApiException]: that is a malformed request, not an unknown
+  /// team.
   ///
   /// The 100-row cap is fixed the way the other list methods fix theirs. FRC
   /// has run since 1992, so no team has more seasons than that.
