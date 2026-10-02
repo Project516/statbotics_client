@@ -1,4 +1,4 @@
-> **Moved.** This package now lives in [Project516/dart-packages](https://github.com/Project516/dart-packages/tree/main/packages/statbotics_client), tagged `statbotics_client-vX.Y.Z`. This repo is archived and gets no further updates.
+> **Moved.** This package now lives in [Project516/dart-packages](https://github.com/Project516/dart-packages/tree/main/packages/statbotics_client), tagged per release, currently `statbotics_client-v0.4.0`. This repo is archived and gets no further updates.
 
 # statbotics_client
 
